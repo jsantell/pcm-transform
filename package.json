@@ -1,0 +1,31 @@
+{
+  "name": "pcm-transform",
+  "version": "1.0.0",
+  "description": "Transformation stream for PCM data",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec --ui bdd"
+  },
+  "author": {
+    "name": "Jordan Santell",
+    "url": "https://github.com/jsantell"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jsantell/pcm-transform"
+  },
+  "keywords": [
+    "pcm",
+    "audio",
+    "stream",
+    "waveform"
+  ],
+  "license": "MIT",
+  "engines": [
+    "node >= 0.10.0"
+  ],
+  "devDependencies": {
+    "chai": "^2.1.1",
+    "mocha": "^2.2.1"
+  }
+}
