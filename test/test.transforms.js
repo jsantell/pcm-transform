@@ -1,4 +1,3 @@
-var fs = require("fs");
 var PCMTransform = require("../");
 var expect = require("chai").expect;
 var utils = require("./utils");
@@ -6,14 +5,14 @@ var equals = require("array-equal");
 
 function drain () {}
 
-function testProcessing (bufferSize, spv, bitDepth, channels, callback) {
+function testProcessing (bufferSize, batchSize, bitDepth, channels, callback) {
   var buffer = new Buffer(bufferSize);
   buffer.fill(127);
   var rstream = utils.createReadStream(buffer, { chunkSize: 5 });
   var called = 0;
   var sizes = [];
   var xstream = PCMTransform({
-    samplesPerValue: spv,
+    batchSize: batchSize,
     inputBitDepth: bitDepth,
     inputChannels: channels,
     transform: transform
@@ -29,12 +28,12 @@ function testProcessing (bufferSize, spv, bitDepth, channels, callback) {
   function transform (b, stream, callback) {
     called++;
     sizes.push(b.length);
-    callback(null, 1);
+    callback();
   }
 }
 
 describe("transforms", function () {
-  describe("process chunks according to bit depth, channels and samplesPerValue", function () {
+  describe("process chunks according to bit depth, channels and batchSize", function () {
     var specs = [
       // sets of buffer sizes, samples per value, bitDepth, channels and expected sizes
       // of processed buffers
@@ -65,19 +64,11 @@ describe("transforms", function () {
     }
   });
 
-  it("handles transformation in chunks specified by samplesPerValue", function (done) {
-//    utils.createReadStream(utils.stereoMix(utils.BUFFERS.SAW_UP, utils.BUFFERS.SAW_DOWN), { chunkSize: 7 })
-    fs.createReadStream(__dirname + "/fixtures/stereo_oop_10k_sine.pcm")
-      .pipe(PCMTransform({ samplesPerValue: 20 }))
-      .pipe(fs.createWriteStream(__dirname + "/output"))
-      .on("finish", done);
-  });
-
-  it("only one chunk, less than samplesPerValue", function (done) {
+  it("only one chunk, less than batchSize", function (done) {
     var buffer = new Buffer(50);
     var dataPumped = false;
     utils.createReadStream(buffer, { chunkSize: 100 })
-      .pipe(PCMTransform({ samplesPerValue: 200, transform: sink }))
+      .pipe(PCMTransform({ batchSize: 200, transform: sink }))
       .on("data", function (b) {
         expect(b.length).to.be.equal(50);
         dataPumped = true;
@@ -93,12 +84,12 @@ describe("transforms", function () {
     }
   });
 
-  it("processes partial set of samples < samplesPerValue at end of stream", function (done) {
+  it("processes partial set of samples < batchSize at end of stream", function (done) {
     var count = 0;
     var buffer = new Buffer(450);
     var dataPumped = false;
     utils.createReadStream(buffer, { chunkSize: 25 })
-      .pipe(PCMTransform({ samplesPerValue: 100, transform: sink }))
+      .pipe(PCMTransform({ batchSize: 100, transform: sink }))
       .on("end", done)
       .resume();
 
@@ -118,7 +109,7 @@ describe("transforms", function () {
     var buffer = new Buffer(4000);
     var dataPumped = false;
     utils.createReadStream(buffer, { chunkSize: 4000 })
-      .pipe(PCMTransform({ samplesPerValue: 200, transform: sink }))
+      .pipe(PCMTransform({ batchSize: 200, transform: sink }))
       .on("end", done)
       .resume();
 

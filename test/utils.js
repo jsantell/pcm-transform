@@ -1,5 +1,4 @@
 var streamBuffers = require("stream-buffers");
-var a2b = require("array-to-buffer");
 
 exports.createReadStream = function (buffer, options) {
   buffer = Buffer.isBuffer(buffer) ? buffer : new Buffer(buffer);
@@ -9,19 +8,13 @@ exports.createReadStream = function (buffer, options) {
   return stream;
 };
 
-exports.stereoMix = function (buffer1, buffer2, bitDepth) {
-  if (Array.isArray(buffer1)) {
-    buffer1 = a2b(buffer1, { endianness: "little", bits: 16, type: "int", signed: true });
-  }
-  if (Array.isArray(buffer2)) {
-    buffer2 = a2b(buffer2, { endianness: "little", bits: 16, type: "int", signed: true });
-  }
-  var stereo = new Buffer(buffer1.length + buffer2.length);
+exports.stereoMix = function (array1, array2, bitDepth) {
+  var stereo = new Buffer((array1.length + array2.length)*2);
 
   // Assume equal length
-  for (var i = 0; i < stereo.length / 4; i++) {
-    stereo.writeInt16LE(buffer1.readInt16LE(i), i * 4);
-    stereo.writeInt16LE(buffer2.readInt16LE(i), (i * 4) + 2);
+  for (var i = 0; i < stereo.length; i+=4) {
+    stereo.writeInt16LE(array1[i ? i/4 : 0], i);
+    stereo.writeInt16LE(array2[i ? i/4 : 0], i + 2);
   }
   return stereo;
 };
