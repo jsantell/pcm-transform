@@ -44,13 +44,29 @@ Constructor for a [transform stream](https://nodejs.org/api/stream.html#stream_c
 
 ## Transforms
 
-* `min-max`: Takes the batch of samples and returns the min and max value amongst all samples (regardless of channel).
+### min-max
+
+Takes the batch of samples and returns the min and max value amongst all samples (regardless of channel) per batch. Results in a buffer of data with sequences of min/max pairs in the form of:
+
+MIN_1 MAX_1 MIN_2 MAX_2 .... MIN_N MAX_N
+
+This is similar to [audiowaveform](https://github.com/bbcrd/audiowaveform/blob/master/doc/DataFormat.md) format.
 
 ## Custom Transforms
 
 TODO
 
 ## JSON Rendering
+
+Specifying `json: true` in the constructor will result in a buffer stream that can be `JSON.parse`d. The array of values is stored in the `data` property. Example of default JSON buffer:
+
+```
+{
+  "data": [0, 100, 200, ..., 400]
+}
+```
+
+The property name and other fields can be customized by providing a `head` or `tail` configuration to overwrite the defaults for JSON.
 
 ## Testing
 
