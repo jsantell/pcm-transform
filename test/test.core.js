@@ -39,5 +39,12 @@ describe("core", function () {
     expect(new PCMTransform({ batchSize: 100 })).to.be.an.instanceof(stream.Transform);
     expect(PCMTransform({ batchSize: 100 })).to.be.an.instanceof(stream.Transform);
   });
+
+  it("doesn't throw max call stack exceeded RangeError when using small batchSize on large chunks", function (done) {
+    var buffer = new Buffer(Math.pow(2, 16));
+    utils.createReadStream(buffer, { chunkSize: Math.pow(2, 16) })
+      .pipe(PCMTransform({ batchSize: 1 }))
+      .on("finish", done);
+  });
 });
 

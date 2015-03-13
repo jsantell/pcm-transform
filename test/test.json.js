@@ -13,7 +13,7 @@ describe("json rendering", function () {
       .on("data", function (d) {
         data += d;
       })
-      .on("finish", end);
+      .on("end", end);
 
     var slopes = [
       [-13107, 13106],
@@ -44,7 +44,7 @@ describe("json rendering", function () {
       .on("data", function (d) {
         data += d;
       })
-      .on("finish", end);
+      .on("end", end);
 
     var slopes = [
       [-13107, 13106],
