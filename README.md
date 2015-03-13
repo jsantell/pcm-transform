@@ -34,9 +34,13 @@ fs.createReadStream("TesseracT - Concealing Fate, Part One: Acceptance.mp3")
 Constructor for a [transform stream](https://nodejs.org/api/stream.html#stream_class_stream_transform). Takes the following config options:
 
 * `batchSize` - Number of samples to batch together to be transformed. If using 16 bit samples in stereo (2 channels), each sample would be 4 bytes. (required)
+* `json` - Whether or not to write downstream a buffer than is JSON.parse'able. (default: `false`). See Rendering JSON section later.
 * `inputChannels` - Number of channels on the input PCM stream. (default: `2`)
 * `inputBitDepth` - Number of bits per sample (per channel). (default: `16`)
+* `outputBitDepth` - Number of bits per value for output. Used to convert buffers from transform functions into JSON. (default: `inputBitDepth`)
 * `transform` - Either a string name of a default transform (`min-max`), or a supplied transform function. The function takes as arguments `buffer`, `stream`, and `callback`. Any error or data passed into the callback gets emitted, or written downstream, accordingly. See [#custom%20transforms](Custom Transforms) for more info.
+* `head` - A buffer or string that gets written downstream when the streaming starts.
+* `tail` - A buffer or string that gets written downstream when the streaming completes.
 
 ## Transforms
 
@@ -45,6 +49,8 @@ Constructor for a [transform stream](https://nodejs.org/api/stream.html#stream_c
 ## Custom Transforms
 
 TODO
+
+## JSON Rendering
 
 ## Testing
 
