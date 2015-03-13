@@ -1,6 +1,6 @@
 {
   "name": "pcm-transform",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Transformation stream for PCM data",
   "main": "index.js",
   "scripts": {
