@@ -58,4 +58,58 @@ describe("transforms - min-max", function () {
       done();
     }
   });
+
+  it("handles 16bit to 8bit output", function (done) {
+    var data = [];
+    var buffer = utils.stereoMix(utils.BUFFERS.SAW_UP, utils.BUFFERS.SAW_DOWN);
+    utils.createReadStream(buffer)
+      .pipe(PCMTransform({ batchSize: 5, transform: "min-max", outputBitDepth: 8 }))
+      .on("data", function (d) { data.push(d); })
+      .on("finish", end);
+
+    var slopes = [
+      [-13107 >> 8, 13106 >> 8],
+      [-29491 >> 8, 29490 >> 8],
+      [-32767 >> 8, 32767 >> 8],
+      [-16384 >> 8, 16383 >> 8]
+    ];
+    function end () {
+      expect(data.length).to.be.equal(40);
+      var merged = Buffer.concat(data, 80);
+      for (var i = 0; i < merged.length; i += 2) {
+        var min = merged.readInt8(i);
+        var max = merged.readInt8(i + 1);
+        expect(min).to.be.equal(slopes[(i?i/2:0)%4][0]);
+        expect(max).to.be.equal(slopes[(i?i/2:0)%4][1]);
+      }
+      done();
+    }
+  });
+
+  it("handles 16bit to 8bit output (json)", function (done) {
+    var data = "";
+    var buffer = utils.stereoMix(utils.BUFFERS.SAW_UP, utils.BUFFERS.SAW_DOWN);
+    utils.createReadStream(buffer)
+      .pipe(PCMTransform({ batchSize: 5, transform: "min-max", outputBitDepth: 8, json: true }))
+      .on("data", function (d) { data += d })
+      .on("finish", end);
+
+    var slopes = [
+      [-13107 >> 8, 13106 >> 8],
+      [-29491 >> 8, 29490 >> 8],
+      [-32767 >> 8, 32767 >> 8],
+      [-16384 >> 8, 16383 >> 8]
+    ];
+    function end () {
+      var json = JSON.parse(data);
+      expect(json.data.length).to.be.equal(80);
+      for (var i = 0; i < json.data.length; i += 2) {
+        var min = json.data[i];
+        var max = json.data[i + 1];
+        expect(min).to.be.equal(slopes[(i/2)%4][0]);
+        expect(max).to.be.equal(slopes[(i/2)%4][1]);
+      }
+      done();
+    }
+  });
 });
