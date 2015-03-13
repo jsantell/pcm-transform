@@ -4,7 +4,7 @@
   "description": "Transformation stream for PCM data",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec --ui bdd"
+    "test": "mocha --reporter spec --ui bdd --timeout 20000"
   },
   "author": {
     "name": "Jordan Santell",
@@ -26,6 +26,11 @@
   ],
   "devDependencies": {
     "chai": "^2.1.1",
-    "mocha": "^2.2.1"
+    "mocha": "^2.2.1",
+    "stream-buffers": "~2.1.0",
+    "array-equal": "~1.0.0"
+  },
+  "dependencies": {
+    "buffer-queue": "^1.0.0"
   }
 }
