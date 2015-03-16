@@ -1,9 +1,10 @@
+var path = require("path");
 var fs = require("fs");
 var PCMTransform = require("../");
 var expect = require("chai").expect;
 var utils = require("./utils");
 var equals = require("array-equal");
-
+var WAVReader = require("wav").Reader;
 var UP_SLOPE = Array.prototype.slice.call(utils.BUFFERS.SAW_UP);
 var DOWN_SLOPE = Array.prototype.slice.call(utils.BUFFERS.SAW_DOWN);
 
@@ -109,6 +110,32 @@ describe("transforms - min-max", function () {
         expect(min).to.be.equal(slopes[(i/2)%4][0]);
         expect(max).to.be.equal(slopes[(i/2)%4][1]);
       }
+      done();
+    }
+  });
+
+  /* mostly a sanity check */
+  it("converts PCM from a wav file into expected output", function (done) {
+    var data = "";
+    fs.createReadStream(path.join(__dirname, "fixtures", "stereo_sine.wav"))
+      .pipe(WAVReader())
+      .pipe(PCMTransform({ batchSize: 100, transform: "min-max", outputBitDepth: 8, json: true }))
+      .on("data", function (d) { data += d })
+      .on("finish", end);
+
+    function end () {
+      var json = JSON.parse(data);
+      expect(json.data.length).to.be.equal(4410);
+      // This is a stereo file where the ampltiude fades from 0 to 1.
+      // ensure our min/max values represent that
+      for (var i = 2; i < json.data.length; i+=2) {
+        expect(json.data[i] <= json.data[i-2]).to.be.ok;
+        expect(json.data[i+1] >= json.data[i-1]).to.be.ok;
+      }
+      expect(json.data[0]).to.be.equal(-1);
+      expect(json.data[1]).to.be.equal(0);
+      expect(json.data[json.data.length-2]).to.be.equal(-128);
+      expect(json.data[json.data.length-1]).to.be.equal(127);
       done();
     }
   });
