@@ -22,8 +22,8 @@ var PCMTransform = require("pcm-transform");
 
 fs.createReadStream("TesseracT - Concealing Fate, Part One: Acceptance.mp3")
   .pipe(new lame.Decoder)
-  .pipe(PCMTransform({ batchSize: 20000 })
-  .pipe(fs.createWriteStream("waveform.data");
+  .pipe(PCMTransform({ batchSize: 20000 }))
+  .pipe(fs.createWriteStream("waveform.data"));
 
 ```
 
